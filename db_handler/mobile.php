@@ -51,6 +51,7 @@ class DbHandlerMobile {
     public function login($log_key, $password) {
         
         $response = array();
+        $response["error"] = false;
 
         if(!$this->validSession)
         {
@@ -71,14 +72,13 @@ class DbHandlerMobile {
         } else if($logType == 1) {
             //phone login
             $response["error"] = true;
-            return $response;
         } else if($logType == 2) {
             //username login
             $response = $this->usernameLogin($log_key, $password);
         } else {
             $response["error"] = true;
-            return $response;
         }
+        return $response;
 
     }
 
@@ -187,6 +187,64 @@ class DbHandlerMobile {
             $response["error"] = true;
             $response["errorID"] = 106;
             $response["error"] = "username not found";
+            return $response;
+        }
+
+    }
+
+    public function getUserDetails($user_id, $my_uid)
+    {
+        
+        $response = array();
+        $response["error"] = false;
+
+        if(!$this->validSession)
+        {
+            $response["error"] = true;
+            return $response;
+        }
+
+        if(!$this->clearance_lvl < 8)
+        {
+            $response["error"] = true;
+            return $response;
+        }
+
+        if($user_id == $my_uid)
+        {
+            $stmt = $this->conn->prepare("SELECT user_id, password, account_closed FROM users WHERE user_id = ?");
+        }
+        else
+        {
+            $stmt = $this->conn->prepare("SELECT user_id, password, account_closed FROM users WHERE user_id = ?");
+        }
+        $stmt->bind_param("i", $user_id);
+        if (!$stmt->execute()) {
+            $stmt->close();
+            $response["error"] = true;
+            $response["errorID"] = 102;
+            $response["error"] = "server error";
+            return $response;
+        }
+        $dataRows = fetchData($stmt);
+        $stmt->close();
+        if (count($dataRows) == 1) {
+            $userData = json_decode(json_encode($dataRows[0]));
+            $user_id = $userData->user_id;
+            if ($user_id) {
+                $response["userData"] = $userData;
+                $response["type"] = 200;
+                return $response;
+            } else {
+                $response["error"] = true;
+                $response["errorID"] = 107;
+                $response["error"] = "user not found";
+                return $response;
+            }
+        } else {
+            $response["error"] = true;
+            $response["errorID"] = 107;
+            $response["error"] = "user not found";
             return $response;
         }
 

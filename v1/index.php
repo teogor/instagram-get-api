@@ -12,18 +12,26 @@ $app = new \Slim\Slim();
 $app->post('/mobile/login', function() use ($app) {
     // check for required params
 
-    verifyRequiredParams(array('api_key', 'secret_key', 'user_id'));
+    verifyRequiredParams(array('api_key', 'secret_key', 'log_key', 'password'));
 
     $api_key = $app->request->post('api_key');
     $secret_key = $app->request->post('secret_key');
-    $user_id = $app->request->post('user_id');
+    $log_key = $app->request->post('log_key');
+    $password = $app->request->post('password');
 
     $response = array();
     $db = new DbHandlerMobile();
     $db->initializeAPI($api_key, $secret_key);
     if($db->validSession) {
-        
-        echoResponse(200, $response);
+        $response = $db->login($log_key, $password);
+        if($response["error"])
+        {
+            echoResponse(101, $response);
+        }
+        else
+        {
+            $db->getUserDetails($response["userData"]["user_id"], $response["userData"]["user_id"]);
+        }
     } else {
         $response["error"] = true;
         $response["errorID"] = 101;
