@@ -30,7 +30,8 @@ $app->post('/mobile/login', function() use ($app) {
         }
         else
         {
-            $db->getUserDetails($response["userData"]["user_id"], $response["userData"]["user_id"]);
+            $response["data"] = $db->getUserDetails($response["userData"]["user_id"], $response["userData"]["user_id"]);
+            echoResponse(200, $response);
         }
     } else {
         $response["error"] = true;
