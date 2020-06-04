@@ -255,7 +255,7 @@ class DbHandlerMobile {
         
         $response = array();
         $response["error"] = false;
-        
+
         $password = password_hash($password, PASSWORD_ARGON2I);
 
         if(!$this->validSession)
@@ -306,6 +306,77 @@ class DbHandlerMobile {
             $response["errorID"] = 107;
             $response["error"] = "user not found";
             return $response;
+        }
+
+    }
+
+    public function checkCredential($credential, $my_uid)
+    {
+
+        $response = array();
+        $response["error"] = false;
+
+        if(!$this->validSession)
+        {
+            $response["error"] = true;
+            return $response;
+        }
+
+        if(!$this->clearance_lvl < 7)
+        {
+            $response["error"] = true;
+            return $response;
+        }
+
+        $logType = typeLogKey($log_key);
+        if($logType == 0) {
+            //email
+            $response = $this->isUsernameExist($credential);
+        } else if($logType == 1) {
+            //phone
+            $response["error"] = true;
+        } else if($logType == 2) {
+            //username
+            $response = $this->isEmailExist($credential);
+        } else {
+            $response["error"] = true;
+        }
+        return $response;
+
+    }
+
+    public function isUsernameExist($username)
+    {
+        if (typeLogKey($username) != 2) return true;
+        $stmt = $this->conn->prepare("SELECT user_id FROM users WHERE username = ?");
+        $stmt->bind_param("s", $username);
+        if ($stmt->execute()) {
+            $dataRows = fetchData($stmt);
+            if (count($dataRows) == 0) {
+                return false;
+            } else {
+                return true;
+            }
+        } else {
+            return true;
+        }
+
+    }
+
+    public function isEmailExist($email)
+    {
+        if (typeLogKey($email) != 0) return true;
+        $stmt = $this->conn->prepare("SELECT * FROM users WHERE email = ? OR email_emergency = ?");
+        $stmt->bind_param("ss", $email, $email);
+        if ($stmt->execute()) {
+            $dataRows = fetchData($stmt);
+            if (count($dataRows) == 0) {
+                return false;
+            } else {
+                return true;
+            }
+        } else {
+            return true;
         }
 
     }

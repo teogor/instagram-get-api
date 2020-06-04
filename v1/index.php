@@ -9,6 +9,7 @@ require '.././libs/Slim/Slim.php';
 \Slim\Slim::registerAutoloader();
 
 $app = new \Slim\Slim();
+
 $app->post('/mobile/login', function() use ($app) {
     // check for required params
 
@@ -41,6 +42,7 @@ $app->post('/mobile/login', function() use ($app) {
     }
 
 });
+
 $app->post('/mobile/signup', function() use ($app) {
     // check for required params
 
@@ -57,6 +59,39 @@ $app->post('/mobile/signup', function() use ($app) {
     $db->initializeAPI($api_key, $secret_key);
     if($db->validSession) {
         $response = $db->signup($email, $username, $password);
+        if($response["error"])
+        {
+            echoResponse(101, $response);
+        }
+        else
+        {
+            $response["data"] = $db->getUserDetails($response["userData"]["user_id"], $response["userData"]["user_id"]);
+            echoResponse(200, $response);
+        }
+    } else {
+        $response["error"] = true;
+        $response["errorID"] = 101;
+        $response["error"] = "invalid api";
+        echoResponse(101, $response);
+    }
+
+});
+
+$app->post('/mobile/credentials/check', function() use ($app) {
+    // check for required params
+
+    verifyRequiredParams(array('api_key', 'secret_key', 'credential', 'my_uid'));
+
+    $api_key = $app->request->post('api_key');
+    $secret_key = $app->request->post('secret_key');
+    $credential = $app->request->post('credential');
+    $my_uid = $app->request->post('my_uid');
+
+    $response = array();
+    $db = new DbHandlerMobile();
+    $db->initializeAPI($api_key, $secret_key);
+    if($db->validSession) {
+        $response = $db->checkCredential($credential, $my_uid);
         if($response["error"])
         {
             echoResponse(101, $response);
