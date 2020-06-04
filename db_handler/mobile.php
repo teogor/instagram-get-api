@@ -328,16 +328,28 @@ class DbHandlerMobile {
             return $response;
         }
 
-        $logType = typeLogKey($log_key);
+        $logType = typeLogKey($credential);
         if($logType == 0) {
             //email
-            $response = $this->isUsernameExist($credential);
+            $exists = $this->isEmailExist($credential, $my_uid);
+            if($exists)
+            {
+                $response["error"] = true;
+                $response["errorID"] = 108;
+                $response["error"] = "email already exists";
+            }
         } else if($logType == 1) {
             //phone
             $response["error"] = true;
         } else if($logType == 2) {
             //username
-            $response = $this->isEmailExist($credential);
+            $exists = $this->isUsernameExist($credential, $my_uid);
+            if($exists)
+            {
+                $response["error"] = true;
+                $response["errorID"] = 108;
+                $response["error"] = "username already exists";
+            }
         } else {
             $response["error"] = true;
         }
@@ -345,11 +357,11 @@ class DbHandlerMobile {
 
     }
 
-    public function isUsernameExist($username)
+    public function isUsernameExist($username, $my_uid)
     {
         if (typeLogKey($username) != 2) return true;
-        $stmt = $this->conn->prepare("SELECT user_id FROM users WHERE username = ?");
-        $stmt->bind_param("s", $username);
+        $stmt = $this->conn->prepare("SELECT user_id FROM users WHERE username = ? AND NOT user_id = ?");
+        $stmt->bind_param("si", $username, $my_uid);
         if ($stmt->execute()) {
             $dataRows = fetchData($stmt);
             if (count($dataRows) == 0) {
@@ -363,11 +375,11 @@ class DbHandlerMobile {
 
     }
 
-    public function isEmailExist($email)
+    public function isEmailExist($email, $my_uid)
     {
         if (typeLogKey($email) != 0) return true;
-        $stmt = $this->conn->prepare("SELECT * FROM users WHERE email = ? OR email_emergency = ?");
-        $stmt->bind_param("ss", $email, $email);
+        $stmt = $this->conn->prepare("SELECT * FROM users WHERE email = ? AND NOT user_id = ?");
+        $stmt->bind_param("si", $email, $my_uid);
         if ($stmt->execute()) {
             $dataRows = fetchData($stmt);
             if (count($dataRows) == 0) {
