@@ -26,6 +26,8 @@ $app->post('/mobile/login', function() use ($app) {
         echoResponse(200, $response);
     } else {
         $response["error"] = true;
+        $response["errorID"] = 101;
+        $response["error"] = "invalid api";
         echoResponse(101, $response);
     }
 

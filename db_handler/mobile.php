@@ -48,8 +48,10 @@ class DbHandlerMobile {
 
     }
 
-    public function emailLogin($log_key, $password) {
+    public function login($log_key, $password) {
         
+        $response = array();
+
         if(!$this->validSession)
         {
             $response["error"] = true;
@@ -62,12 +64,36 @@ class DbHandlerMobile {
             return $response;
         }
 
+        $logType = typeLogKey($log_key);
+        if($logType == 0) {
+            //email login
+            $response = $this->emailLogin($log_key, $password);
+        } else if($logType == 1) {
+            //phone login
+            $response["error"] = true;
+            return $response;
+        } else if($logType == 2) {
+            //username login
+            $response = $this->usernameLogin($log_key, $password);
+        } else {
+            $response["error"] = true;
+            return $response;
+        }
+
+    }
+
+    private function emailLogin($log_key, $password)
+    {
+
         $response = array();
-        $stmt = $this->conn->prepare("SELECT user_id, password, account_closed, verified_email, authentication_type FROM users WHERE email = ?");
+
+        $stmt = $this->conn->prepare("SELECT user_id, password, account_closed FROM users WHERE email = ?");
         $stmt->bind_param("s", $log_key);
         if (!$stmt->execute()) {
             $stmt->close();
-            $response["type"] = 101;
+            $response["error"] = true;
+            $response["errorID"] = 102;
+            $response["error"] = "server error";
             return $response;
         }
         $dataRows = fetchData($stmt);
@@ -77,35 +103,90 @@ class DbHandlerMobile {
             $user_id = $userData->user_id;
             $passwordN = $userData->password;
             $account_closed = $userData->account_closed;
-            $verified_email = $userData->verified_email;
-            $authentication_type = $userData->authentication_type;
             if ($user_id) {
                 if (password_verify($password, $passwordN)) {
                     if($account_closed == 1) {
-                        $response["type"] = 102;
+                        $response["error"] = true;
+                        $response["errorID"] = 103;
+                        $response["error"] = "account closed";
                         return $response;
-                    } else if($verified_email == 0) {
-                        $response["type"] = 103;
-                        return $response;
-                    } else if($authentication_type == 1) {
-                        $response["type"] = 104;
-                        return $response;
-                    } else if($authentication_type == 0) {
+                    } else {
                         unset($userData->{"password"});
                         $response["userData"] = $userData;
                         $response["type"] = 200;
                         return $response;
                     }
                 } else {
-                    $response["type"] = 105;
+                    $response["error"] = true;
+                    $response["errorID"] = 104;
+                    $response["error"] = "wrong password";
                     return $response;
                 }
             } else {
-                $response["type"] = 106;
+                $response["error"] = true;
+                $response["errorID"] = 105;
+                $response["error"] = "invalid user_id";
                 return $response;
             }
         } else {
-            $response["type"] = 106;
+            $response["error"] = true;
+            $response["errorID"] = 106;
+            $response["error"] = "email not found";
+            return $response;
+        }
+
+    }
+
+    private function usernameLogin($log_key, $password)
+    {
+
+        $response = array();
+
+        $stmt = $this->conn->prepare("SELECT user_id, password, account_closed FROM users WHERE username = ?");
+        $stmt->bind_param("s", $log_key);
+        if (!$stmt->execute()) {
+            $stmt->close();
+            $response["error"] = true;
+            $response["errorID"] = 102;
+            $response["error"] = "server error";
+            return $response;
+        }
+        $dataRows = fetchData($stmt);
+        $stmt->close();
+        if (count($dataRows) == 1) {
+            $userData = json_decode(json_encode($dataRows[0]));
+            $user_id = $userData->user_id;
+            $passwordN = $userData->password;
+            $account_closed = $userData->account_closed;
+            if ($user_id) {
+                if (password_verify($password, $passwordN)) {
+                    if($account_closed == 1) {
+                        $response["error"] = true;
+                        $response["errorID"] = 103;
+                        $response["error"] = "account closed";
+                        return $response;
+                    } else {
+                        unset($userData->{"password"});
+                        $response["userData"] = $userData;
+                        $response["type"] = 200;
+                        return $response;
+                    }
+                } else {
+                    $response["error"] = true;
+                    $response["errorID"] = 104;
+                    $response["error"] = "wrong password";
+                    return $response;
+                }
+            } else {
+                $response["error"] = true;
+                $response["errorID"] = 105;
+                $response["error"] = "invalid user_id";
+                return $response;
+            }
+        } else {
+            $response["error"] = true;
+            $response["errorID"] = 106;
+            $response["error"] = "username not found";
             return $response;
         }
 
