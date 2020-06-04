@@ -3,8 +3,7 @@
 error_reporting(-1);
 ini_set('display_errors', 'On');
 
-require_once '../db_handler/web.php';
-require_once '../db_handler/unity.php';
+require_once '../db_handler/mobile.php';
 require '.././libs/Slim/Slim.php';
 
 \Slim\Slim::registerAutoloader();
@@ -27,6 +26,8 @@ $app->post('/mobile/login', function() use ($app) {
         echoResponse(200, $response);
     } else {
         $response["error"] = true;
+        $response["errorID"] = 101;
+        $response["error"] = "invalid api";
         echoResponse(101, $response);
     }
 
