@@ -51,6 +51,7 @@ class DbHandlerMobile {
     public function login($log_key, $password) {
         
         $response = array();
+        $response["error"] = false;
 
         if(!$this->validSession)
         {
@@ -71,14 +72,13 @@ class DbHandlerMobile {
         } else if($logType == 1) {
             //phone login
             $response["error"] = true;
-            return $response;
         } else if($logType == 2) {
             //username login
             $response = $this->usernameLogin($log_key, $password);
         } else {
             $response["error"] = true;
-            return $response;
         }
+        return $response;
 
     }
 
