@@ -41,6 +41,39 @@ $app->post('/mobile/login', function() use ($app) {
     }
 
 });
+$app->post('/mobile/signup', function() use ($app) {
+    // check for required params
+
+    verifyRequiredParams(array('api_key', 'secret_key', 'email', 'username', 'password'));
+
+    $api_key = $app->request->post('api_key');
+    $secret_key = $app->request->post('secret_key');
+    $email = $app->request->post('email');
+    $username = $app->request->post('username');
+    $password = $app->request->post('password');
+
+    $response = array();
+    $db = new DbHandlerMobile();
+    $db->initializeAPI($api_key, $secret_key);
+    if($db->validSession) {
+        $response = $db->signup($email, $username, $password);
+        if($response["error"])
+        {
+            echoResponse(101, $response);
+        }
+        else
+        {
+            $response["data"] = $db->getUserDetails($response["userData"]["user_id"], $response["userData"]["user_id"]);
+            echoResponse(200, $response);
+        }
+    } else {
+        $response["error"] = true;
+        $response["errorID"] = 101;
+        $response["error"] = "invalid api";
+        echoResponse(101, $response);
+    }
+
+});
 
 /**
  * Verifying required params posted or not
