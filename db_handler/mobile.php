@@ -336,7 +336,7 @@ class DbHandlerMobile {
             {
                 $response["error"] = true;
                 $response["errorID"] = 108;
-                $response["error"] = "username already exists";
+                $response["error"] = "email already exists";
             }
         } else if($logType == 1) {
             //phone
@@ -348,7 +348,7 @@ class DbHandlerMobile {
             {
                 $response["error"] = true;
                 $response["errorID"] = 108;
-                $response["error"] = "email already exists";
+                $response["error"] = "username already exists";
             }
         } else {
             $response["error"] = true;
