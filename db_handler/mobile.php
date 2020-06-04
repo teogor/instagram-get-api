@@ -231,8 +231,6 @@ class DbHandlerMobile {
         if (count($dataRows) == 1) {
             $userData = json_decode(json_encode($dataRows[0]));
             $user_id = $userData->user_id;
-            $passwordN = $userData->password;
-            $account_closed = $userData->account_closed;
             if ($user_id) {
                 $response["userData"] = $userData;
                 $response["type"] = 200;
