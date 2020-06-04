@@ -11,9 +11,9 @@
  * Alghoritm: Arcfour
  * Mode: CBC
  */
-define('DB_USERNAME', 'Rdra5iCsXYw7XlkaEiMxVcsGCf0=');
-define('DB_PASSWORD', 'RNuZs3D5BtJv');
-define('DB_HOST', 'QNGItXT0Bch+');
-define('DB_NAME', 'Rdra5iCsXYw7XlkaEiMxVcsGCf0bXQ==');
+define('DB_USERNAME', 'id13957036_iggetprodb=');
+define('DB_PASSWORD', '~D(nF8FEn0AM7A4%[oKP3W=ksZT#c=Je');
+define('DB_HOST', 'localhost');
+define('DB_NAME', 'id13957036_iggetpro');
 
 ?>

@@ -10,31 +10,20 @@ require '.././libs/Slim/Slim.php';
 \Slim\Slim::registerAutoloader();
 
 $app = new \Slim\Slim();
-$app->post('/unity/get/skills', function() use ($app) {
+$app->post('/mobile/login', function() use ($app) {
     // check for required params
 
-    verifyRequiredParams(array('api_key', 'api_password', 'user_id'));
+    verifyRequiredParams(array('api_key', 'secret_key', 'user_id'));
 
     $api_key = $app->request->post('api_key');
-    $api_password = $app->request->post('api_password');
+    $secret_key = $app->request->post('secret_key');
     $user_id = $app->request->post('user_id');
 
     $response = array();
-    $db = new DbHandlerUnity();
-    $db->initializeAPI($api_key, $api_password);
+    $db = new DbHandlerMobile();
+    $db->initializeAPI($api_key, $secret_key);
     if($db->validSession) {
-        $response["error"] = false;
-        $skills = array();
-        $skill = array();
-        $skill["skill_id"] = 2332;
-        $skill["name"] = "Name?";
-        $skill["class_type"] = 2;
-        $skill["row"] = 2;
-        $skills[] = $skill;
-        $skills[] = $skill;
-        $skills[] = $skill;
-        $skills[] = $skill;
-        $response["skills"] = $skills;
+        
         echoResponse(200, $response);
     } else {
         $response["error"] = true;
