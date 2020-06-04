@@ -331,13 +331,25 @@ class DbHandlerMobile {
         $logType = typeLogKey($credential);
         if($logType == 0) {
             //email
-            $response = $this->isUsernameExist($credential, $my_uid);
+            $exists = $this->isEmailExist($credential, $my_uid);
+            if($exists)
+            {
+                $response["error"] = true;
+                $response["errorID"] = 108;
+                $response["error"] = "username already exists";
+            }
         } else if($logType == 1) {
             //phone
             $response["error"] = true;
         } else if($logType == 2) {
             //username
-            $response = $this->isEmailExist($credential, $my_uid);
+            $exists = $this->isUsernameExist($credential, $my_uid);
+            if($exists)
+            {
+                $response["error"] = true;
+                $response["errorID"] = 108;
+                $response["error"] = "email already exists";
+            }
         } else {
             $response["error"] = true;
         }
