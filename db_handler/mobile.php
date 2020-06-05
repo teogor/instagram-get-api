@@ -30,7 +30,7 @@ class DbHandlerMobile {
     public function initializeAPI($api_key, $secret_key)
     {
         
-        $sqlQuery = "SELECT clearance_lvl FROM api_clients WHERE api_key = ? AND secret_key = ?";
+        $sqlQuery = "SELECT clearance_lvl FROM apis WHERE api_key = ? AND secret_key = ?";
         $stmt = $this->conn->prepare($sqlQuery);
         $stmt->bind_param("ss", $api_key, $secret_key);
         if ($stmt->execute()) {
