@@ -3,7 +3,7 @@
 class DbHandlerMobile {
 
     private $conn;
-    private $validSession = false;
+    public $validSession = false;
     private $clearance_lvl = 0;
     
     // if(!$this->validSession)
@@ -30,6 +30,9 @@ class DbHandlerMobile {
     public function initializeAPI($api_key, $secret_key)
     {
         
+        $response = array();
+        $response["error"] = false;
+
         $sqlQuery = "SELECT clearance_lvl FROM apis WHERE api_key = ? AND secret_key = ?";
         $stmt = $this->conn->prepare($sqlQuery);
         $stmt->bind_param("ss", $api_key, $secret_key);
@@ -38,13 +41,14 @@ class DbHandlerMobile {
             if (count($dataRows) == 1) {
                 $this->validSession = true;
                 $this->clearance_lvl = $dataRows[0]["clearance_lvl"];
-                return $this->clearance_lvl;
             } else {
-                return 0;
+                $response["error"] = true;
             }
         } else {
-            return 0;
+            $response["error"] = true;
         }
+
+        return $response;
 
     }
 
