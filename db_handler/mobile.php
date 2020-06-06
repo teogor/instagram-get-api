@@ -275,8 +275,42 @@ class DbHandlerMobile {
             $response["errorContent"] = "you don't have the right to access this function 'sign_up'";
             return $response;
         }
-        
-
+                
+        $username = strtolower($username);
+        $usernameExist = $this->isUsernameExist($username, 0);
+        $emailExist = $this->isEmailExist($email, 0);
+        if(!$usernameExist && !$emailExist) {
+            $stmt = $this->conn->prepare("INSERT INTO users (email, username, password) VALUES (?, ?, ?)");
+            $stmt->bind_param("sss", $email, $username, $password);
+            if ($stmt->execute()) {
+                $insert_id = $stmt->insert_id;
+                $stmt->fetch();
+                $stmt->close();
+                $response["type"] = 200;
+                $response["insert_id"] = $insert_id;
+            } else {
+                $response["errorID"] = 108;
+                $response["error"] = true;
+                $response["errorContent"] = "server error";
+            }
+        } else {
+            if($usernameExist && $emailExist) {
+                $response["errorID"] = 108;
+                $response["error"] = true;
+                $response["errorContent"] = "username and email already exists";
+            }
+            else if($usernameExist) {
+                $response["errorID"] = 108;
+                $response["error"] = true;
+                $response["errorContent"] = "username already exists";
+            }
+            else if($emailExist) {
+                $response["errorID"] = 108;
+                $response["error"] = true;
+                $response["errorContent"] = "email already exists";
+            }
+        }
+        return $response;
 
     }
 
