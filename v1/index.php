@@ -27,7 +27,7 @@ $app->post('/mobile/login', function() use ($app) {
         $response = $db->login($log_key, $password);
         if($response["error"])
         {
-            echoResponse(101, $response);
+            echoResponse(511, $response);
         }
         else
         {
@@ -36,9 +36,9 @@ $app->post('/mobile/login', function() use ($app) {
         }
     } else {
         $response["error"] = true;
-        $response["errorID"] = 101;
-        $response["error"] = "invalid api";
-        echoResponse(101, $response);
+        $response["errorID"] = 511;
+        $response["errorContent"] = "invalid api";
+        echoResponse(511, $response);
     }
 
 });
@@ -61,7 +61,7 @@ $app->post('/mobile/signup', function() use ($app) {
         $response = $db->signup($email, $username, $password);
         if($response["error"])
         {
-            echoResponse(101, $response);
+            echoResponse(511, $response);
         }
         else
         {
@@ -70,9 +70,9 @@ $app->post('/mobile/signup', function() use ($app) {
         }
     } else {
         $response["error"] = true;
-        $response["errorID"] = 101;
-        $response["error"] = "invalid api";
-        echoResponse(101, $response);
+        $response["errorID"] = 511;
+        $response["errorContent"] = "invalid api";
+        echoResponse(511, $response);
     }
 
 });
@@ -88,24 +88,27 @@ $app->post('/mobile/credentials/check', function() use ($app) {
     $my_uid = $app->request->post('my_uid');
 
     $response = array();
+    $response["api_key"] = $api_key;
+    $response["secret_key"] = $secret_key;
+
     $db = new DbHandlerMobile();
     $db->initializeAPI($api_key, $secret_key);
     if($db->validSession) {
         $response = $db->checkCredential($credential, $my_uid);
         if($response["error"])
         {
-            echoResponse(101, $response);
+            echoResponse(511, $response);
         }
         else
         {
-            $response["data"] = $db->getUserDetails($response["userData"]["user_id"], $response["userData"]["user_id"]);
             echoResponse(200, $response);
         }
+
     } else {
         $response["error"] = true;
-        $response["errorID"] = 101;
-        $response["error"] = "invalid api";
-        echoResponse(101, $response);
+        $response["errorID"] = 511;
+        $response["errorContent"] = "invalid api";
+        echoResponse(511, $response);
     }
 
 });

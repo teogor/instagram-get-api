@@ -63,7 +63,7 @@ class DbHandlerMobile {
             return $response;
         }
 
-        if(!$this->clearance_lvl < 9)
+        if($this->clearance_lvl < 9)
         {
             $response["error"] = true;
             return $response;
@@ -97,7 +97,7 @@ class DbHandlerMobile {
             $stmt->close();
             $response["error"] = true;
             $response["errorID"] = 102;
-            $response["error"] = "server error";
+            $response["errorContent"] = "server error";
             return $response;
         }
         $dataRows = fetchData($stmt);
@@ -112,7 +112,7 @@ class DbHandlerMobile {
                     if($account_closed == 1) {
                         $response["error"] = true;
                         $response["errorID"] = 103;
-                        $response["error"] = "account closed";
+                        $response["errorContent"] = "account closed";
                         return $response;
                     } else {
                         unset($userData->{"password"});
@@ -123,19 +123,19 @@ class DbHandlerMobile {
                 } else {
                     $response["error"] = true;
                     $response["errorID"] = 104;
-                    $response["error"] = "wrong password";
+                    $response["errorContent"] = "wrong password";
                     return $response;
                 }
             } else {
                 $response["error"] = true;
                 $response["errorID"] = 105;
-                $response["error"] = "invalid user_id";
+                $response["errorContent"] = "invalid user_id";
                 return $response;
             }
         } else {
             $response["error"] = true;
             $response["errorID"] = 106;
-            $response["error"] = "email not found";
+            $response["errorContent"] = "email not found";
             return $response;
         }
 
@@ -152,7 +152,7 @@ class DbHandlerMobile {
             $stmt->close();
             $response["error"] = true;
             $response["errorID"] = 102;
-            $response["error"] = "server error";
+            $response["errorContent"] = "server error";
             return $response;
         }
         $dataRows = fetchData($stmt);
@@ -167,7 +167,7 @@ class DbHandlerMobile {
                     if($account_closed == 1) {
                         $response["error"] = true;
                         $response["errorID"] = 103;
-                        $response["error"] = "account closed";
+                        $response["errorContent"] = "account closed";
                         return $response;
                     } else {
                         unset($userData->{"password"});
@@ -178,19 +178,19 @@ class DbHandlerMobile {
                 } else {
                     $response["error"] = true;
                     $response["errorID"] = 104;
-                    $response["error"] = "wrong password";
+                    $response["errorContent"] = "wrong password";
                     return $response;
                 }
             } else {
                 $response["error"] = true;
                 $response["errorID"] = 105;
-                $response["error"] = "invalid user_id";
+                $response["errorContent"] = "invalid user_id";
                 return $response;
             }
         } else {
             $response["error"] = true;
             $response["errorID"] = 106;
-            $response["error"] = "username not found";
+            $response["errorContent"] = "username not found";
             return $response;
         }
 
@@ -208,7 +208,7 @@ class DbHandlerMobile {
             return $response;
         }
 
-        if(!$this->clearance_lvl < 8)
+        if($this->clearance_lvl < 8)
         {
             $response["error"] = true;
             return $response;
@@ -227,7 +227,7 @@ class DbHandlerMobile {
             $stmt->close();
             $response["error"] = true;
             $response["errorID"] = 102;
-            $response["error"] = "server error";
+            $response["errorContent"] = "server error";
             return $response;
         }
         $dataRows = fetchData($stmt);
@@ -242,13 +242,13 @@ class DbHandlerMobile {
             } else {
                 $response["error"] = true;
                 $response["errorID"] = 107;
-                $response["error"] = "user not found";
+                $response["errorContent"] = "user not found";
                 return $response;
             }
         } else {
             $response["error"] = true;
             $response["errorID"] = 107;
-            $response["error"] = "user not found";
+            $response["errorContent"] = "user not found";
             return $response;
         }
 
@@ -265,52 +265,18 @@ class DbHandlerMobile {
         if(!$this->validSession)
         {
             $response["error"] = true;
+            $response["errorContent"] = "invalid sesion";
             return $response;
         }
 
-        if(!$this->clearance_lvl < 9)
+        if($this->clearance_lvl < 9)
         {
             $response["error"] = true;
+            $response["errorContent"] = "you don't have the right to access this function 'sign_up'";
             return $response;
         }
+        
 
-        if($user_id == $my_uid)
-        {
-            $stmt = $this->conn->prepare("SELECT user_id, password, account_closed FROM users WHERE user_id = ?");
-        }
-        else
-        {
-            $stmt = $this->conn->prepare("SELECT user_id, password, account_closed FROM users WHERE user_id = ?");
-        }
-        $stmt->bind_param("i", $user_id);
-        if (!$stmt->execute()) {
-            $stmt->close();
-            $response["error"] = true;
-            $response["errorID"] = 102;
-            $response["error"] = "server error";
-            return $response;
-        }
-        $dataRows = fetchData($stmt);
-        $stmt->close();
-        if (count($dataRows) == 1) {
-            $userData = json_decode(json_encode($dataRows[0]));
-            $user_id = $userData->user_id;
-            if ($user_id) {
-                $response["userData"] = $userData;
-                $response["type"] = 200;
-                return $response;
-            } else {
-                $response["error"] = true;
-                $response["errorID"] = 107;
-                $response["error"] = "user not found";
-                return $response;
-            }
-        } else {
-            $response["error"] = true;
-            $response["errorID"] = 107;
-            $response["error"] = "user not found";
-            return $response;
-        }
 
     }
 
@@ -326,7 +292,7 @@ class DbHandlerMobile {
             return $response;
         }
 
-        if(!$this->clearance_lvl < 7)
+        if($this->clearance_lvl < 7)
         {
             $response["error"] = true;
             return $response;
@@ -340,7 +306,11 @@ class DbHandlerMobile {
             {
                 $response["error"] = true;
                 $response["errorID"] = 108;
-                $response["error"] = "email already exists";
+                $response["errorContent"] = "email already exists";
+            }
+            else
+            {
+                $response["onSuccess"] = true;
             }
         } else if($logType == 1) {
             //phone
@@ -352,7 +322,11 @@ class DbHandlerMobile {
             {
                 $response["error"] = true;
                 $response["errorID"] = 108;
-                $response["error"] = "username already exists";
+                $response["errorContent"] = "username already exists";
+            }
+            else
+            {
+                $response["onSuccess"] = true;
             }
         } else {
             $response["error"] = true;
