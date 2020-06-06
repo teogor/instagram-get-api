@@ -216,39 +216,54 @@ class DbHandlerMobile {
 
         if($user_id == $my_uid)
         {
-            $stmt = $this->conn->prepare("SELECT user_id, password, account_closed FROM users WHERE user_id = ?");
+            $sql = "SELECT user_id, email, username, password, coins FROM users WHERE user_id = ?";
         }
         else
         {
-            $stmt = $this->conn->prepare("SELECT user_id, password, account_closed FROM users WHERE user_id = ?");
+            $sql = "SELECT user_id, username, coins FROM users WHERE user_id = ?";
         }
-        $stmt->bind_param("i", $user_id);
-        if (!$stmt->execute()) {
-            $stmt->close();
+
+        if (!($stmt = $this->conn->prepare($sql))) {
             $response["error"] = true;
             $response["errorID"] = 102;
             $response["errorContent"] = "server error";
             return $response;
         }
-        $dataRows = fetchData($stmt);
-        $stmt->close();
-        if (count($dataRows) == 1) {
-            $userData = json_decode(json_encode($dataRows[0]));
-            $user_id = $userData->user_id;
-            if ($user_id) {
-                $response["userData"] = $userData;
-                $response["type"] = 200;
-                return $response;
+        if (!$stmt->bind_param("i", $user_id)) {
+            $response["error"] = true;
+            $response["errorID"] = 102;
+            $response["errorContent"] = "server error";
+            $stmt->close();
+            return $response;
+        }
+        if (!$stmt->execute()) {
+            $response["error"] = true;
+            $response["errorID"] = 102;
+            $response["errorContent"] = "server error";
+            $stmt->close();
+            return $response;
+        } else {
+            $dataRows = fetchData($stmt);
+            $stmt->close();
+            if (count($dataRows) == 1) {
+                $userData = json_decode(json_encode($dataRows[0]));
+                $user_id = $userData->user_id;
+                if ($user_id) {
+                    $response["userData"] = $userData;
+                    $response["type"] = 200;
+                    return $response;
+                } else {
+                    $response["error"] = true;
+                    $response["errorID"] = 107;
+                    $response["errorContent"] = "user not found";
+                    return $response;
+                }
             } else {
                 $response["error"] = true;
                 $response["errorID"] = 107;
                 $response["errorContent"] = "user not found";
                 return $response;
             }
-        } else {
-            $response["error"] = true;
-            $response["errorID"] = 107;
-            $response["errorContent"] = "user not found";
             return $response;
         }
 
@@ -287,7 +302,7 @@ class DbHandlerMobile {
                 $stmt->fetch();
                 $stmt->close();
                 $response["type"] = 200;
-                $response["insert_id"] = $insert_id;
+                $response["uuid"] = $insert_id;
             } else {
                 $response["errorID"] = 108;
                 $response["error"] = true;
@@ -376,7 +391,7 @@ class DbHandlerMobile {
         $stmt->bind_param("si", $username, $my_uid);
         if ($stmt->execute()) {
             $dataRows = fetchData($stmt);
-            if (count($dataRows) == 0) {
+            if (count($dataRows) == 0 && strlen($username)>=3) {
                 return false;
             } else {
                 return true;

@@ -59,13 +59,14 @@ $app->post('/mobile/signup', function() use ($app) {
     $db->initializeAPI($api_key, $secret_key);
     if($db->validSession) {
         $response = $db->signup($email, $username, $password);
+        $response["uuid"] = $response["uuid"];
         if($response["error"])
         {
             echoResponse(511, $response);
         }
         else
         {
-            $response["data"] = $db->getUserDetails($response["userData"]["user_id"], $response["userData"]["user_id"]);
+            $response["data"] = $db->getUserDetails($response["uuid"], $response["uuid"]);
             echoResponse(200, $response);
         }
     } else {
