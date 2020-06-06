@@ -89,9 +89,6 @@ $app->post('/mobile/credentials/check', function() use ($app) {
     $my_uid = $app->request->post('my_uid');
 
     $response = array();
-    $response["api_key"] = $api_key;
-    $response["secret_key"] = $secret_key;
-
     $db = new DbHandlerMobile();
     $db->initializeAPI($api_key, $secret_key);
     if($db->validSession) {
@@ -102,7 +99,7 @@ $app->post('/mobile/credentials/check', function() use ($app) {
         }
         else
         {
-            echoResponse(200, $response);
+            echoResponse(145, $response);
         }
 
     } else {
