@@ -108,17 +108,11 @@ class DbHandlerMobile {
             $passwordN = $userData->password;
             if ($user_id) {
                 if (password_verify($password, $passwordN)) {
-                    if($account_closed == 1) {
-                        $response["error"] = true;
-                        $response["errorID"] = 103;
-                        $response["errorContent"] = "account closed";
-                        return $response;
-                    } else {
-                        unset($userData->{"password"});
-                        $response["userData"] = $userData;
-                        $response["type"] = 200;
-                        return $response;
-                    }
+                    unset($userData->{"password"});
+                    $response["error"] = false;
+                    $response["userData"] = $userData;
+                    $response["type"] = 200;
+                    return $response;
                 } else {
                     $response["error"] = true;
                     $response["errorID"] = 104;
@@ -175,17 +169,11 @@ class DbHandlerMobile {
                 $passwordN = $userData->password;
                 if ($user_id) {
                     if (password_verify($password, $passwordN)) {
-                        if($account_closed == 1) {
-                            $response["error"] = true;
-                            $response["errorID"] = 103;
-                            $response["errorContent"] = "account closed";
-                            return $response;
-                        } else {
-                            unset($userData->{"password"});
-                            $response["userData"] = $userData;
-                            $response["type"] = 200;
-                            return $response;
-                        }
+                        unset($userData->{"password"});
+                        $response["userData"] = $userData;
+                        $response["type"] = 200;
+                        $response["error"] = false;
+                        return $response;
                     } else {
                         $response["error"] = true;
                         $response["errorID"] = 104;

@@ -23,8 +23,6 @@ $app->post('/mobile/login', function() use ($app) {
     $response = array();
     $db = new DbHandlerMobile();
     $db->initializeAPI($api_key, $secret_key);
-    // $response["3247rfwdyrf67fD&"] = true;
-    // return echoResponse(200, $response);
     if($db->validSession) {
         $response = $db->login($log_key, $password);
         if($response["error"])
@@ -33,7 +31,7 @@ $app->post('/mobile/login', function() use ($app) {
         }
         else
         {
-            $response["data"] = $db->getUserDetails($response["userData"]["user_id"], $response["userData"]["user_id"]);
+            $response["data"] = $db->getUserDetails($response["userData"]->{"user_id"}, $response["userData"]->{"user_id"});
             echoResponse(200, $response);
         }
     } else {
