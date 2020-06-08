@@ -425,6 +425,11 @@ class DbHandlerMobile {
 
     }
 
+    public function linkIGAccount($my_uid, $username, $igid, $password, $profile_picture)
+    {
+        
+    }
+
 }
 
 ?>

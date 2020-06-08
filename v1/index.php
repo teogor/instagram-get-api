@@ -159,7 +159,7 @@ $app->post('/mobile/ig/link', function() use ($app) {
     $db = new DbHandlerMobile();
     $db->initializeAPI($api_key, $secret_key);
     if($db->validSession) {
-        $response = $db->linkIGAccount($uuid, $my_uid);
+        $response = $db->linkIGAccount($my_uid, $username, $igid, $password, $profile_picture);
         if($response["error"])
         {
             echoResponse(511, $response);
