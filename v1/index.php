@@ -124,7 +124,9 @@ $app->post('/mobile/user/details', function() use ($app) {
     $db = new DbHandlerMobile();
     $db->initializeAPI($api_key, $secret_key);
     if($db->validSession) {
-        $response["data"] = $db->getUserDetails($uuid, $my_uid);
+        $response = $db->getUserDetails($uuid, $my_uid);
+        // $response["wasfsdg"] = 21425235;
+        // return echoResponse(511, $response);
         if($response["error"])
         {
             echoResponse(511, $response);
