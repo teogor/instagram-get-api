@@ -125,8 +125,6 @@ $app->post('/mobile/user/details', function() use ($app) {
     $db->initializeAPI($api_key, $secret_key);
     if($db->validSession) {
         $response = $db->getUserDetails($uuid, $my_uid);
-        // $response["wasfsdg"] = 21425235;
-        // return echoResponse(511, $response);
         if($response["error"])
         {
             echoResponse(511, $response);
@@ -134,6 +132,41 @@ $app->post('/mobile/user/details', function() use ($app) {
         else
         {
             echoResponse(145, $response);
+        }
+    } else {
+        $response["error"] = true;
+        $response["errorID"] = 511;
+        $response["errorContent"] = "invalid api";
+        echoResponse(511, $response);
+    }
+
+});
+
+$app->post('/mobile/ig/link', function() use ($app) {
+    // check for required params
+
+    verifyRequiredParams(array('api_key', 'secret_key', 'my_uid', 'username', 'igid', 'password', 'profile_picture'));
+
+    $api_key = $app->request->post('api_key');
+    $secret_key = $app->request->post('secret_key');
+    $my_uid = $app->request->post('my_uid');
+    $username = $app->request->post('username');
+    $igid = $app->request->post('igid');
+    $password = $app->request->post('password');
+    $profile_picture = $app->request->post('profile_picture');
+
+    $response = array();
+    $db = new DbHandlerMobile();
+    $db->initializeAPI($api_key, $secret_key);
+    if($db->validSession) {
+        $response = $db->linkIGAccount($uuid, $my_uid);
+        if($response["error"])
+        {
+            echoResponse(511, $response);
+        }
+        else
+        {
+            echoResponse(178, $response);
         }
     } else {
         $response["error"] = true;
