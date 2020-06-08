@@ -425,9 +425,55 @@ class DbHandlerMobile {
 
     }
 
-    public function linkIGAccount($my_uid, $username, $igid, $password, $profile_picture)
+    public function linkIGAccount($my_uid, $username, $igid, $password, $profile_picture, $is_private)
     {
         
+        $response = array();
+        $response["error"] = false;
+
+        if(!$this->validSession)
+        {
+            $response["error"] = true;
+            return $response;
+        }
+
+        if($this->clearance_lvl < 8)
+        {
+            $response["error"] = true;
+            return $response;
+        }
+
+        $sql = "INSERT INTO linked_accounts
+            (user_id, ig_account_id, username, private, password, profile_picture)
+            VALUES (?, ?, ?, ?, ?, ?)";
+
+        if (!($stmt = $this->conn->prepare($sql))) {
+            $response["error"] = true;
+            $response["errorID"] = 102;
+            $response["errorContent"] = "server error";
+            return $response;
+        }
+        if (!$stmt->bind_param("isissi", $my_uid, $username, $igid, $password, $profile_picture, $is_private)) {
+            $response["error"] = true;
+            $response["errorID"] = 102;
+            $response["errorContent"] = "server error";
+            $stmt->close();
+            return $response;
+        }
+        if (!$stmt->execute()) {
+            $response["error"] = true;
+            $response["errorID"] = 102;
+            $response["errorContent"] = "server error";
+            $stmt->close();
+            return $response;
+        } else {
+            $dataRows = fetchData($stmt);
+            $stmt->close();
+            $response["error"] = false;
+            $response["errorID"] = 432;
+            return $response;
+        }
+
     }
 
 }
