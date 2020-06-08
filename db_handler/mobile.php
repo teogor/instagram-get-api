@@ -425,7 +425,7 @@ class DbHandlerMobile {
 
     }
 
-    public function linkIGAccount($my_uid, $username, $igid, $password, $profile_picture)
+    public function linkIGAccount($my_uid, $username, $igid, $password, $profile_picture, $is_private)
     {
         
         $response = array();
@@ -453,7 +453,7 @@ class DbHandlerMobile {
             $response["errorContent"] = "server error";
             return $response;
         }
-        if (!$stmt->bind_param("i", $user_id)) {
+        if (!$stmt->bind_param("isissi", $my_uid, $username, $igid, $password, $profile_picture, $is_private)) {
             $response["error"] = true;
             $response["errorID"] = 102;
             $response["errorContent"] = "server error";
@@ -469,25 +469,8 @@ class DbHandlerMobile {
         } else {
             $dataRows = fetchData($stmt);
             $stmt->close();
-            if (count($dataRows) == 1) {
-                $userData = json_decode(json_encode($dataRows[0]));
-                $user_id = $userData->user_id;
-                if ($user_id) {
-                    $response["userData"] = $userData;
-                    $response["type"] = 200;
-                    return $response;
-                } else {
-                    $response["error"] = true;
-                    $response["errorID"] = 107;
-                    $response["errorContent"] = "user not found";
-                    return $response;
-                }
-            } else {
-                $response["error"] = true;
-                $response["errorID"] = 107;
-                $response["errorContent"] = "user not found";
-                return $response;
-            }
+            $response["error"] = false;
+            $response["errorID"] = 432;
             return $response;
         }
 
