@@ -145,7 +145,7 @@ $app->post('/mobile/user/details', function() use ($app) {
 $app->post('/mobile/ig/link', function() use ($app) {
     // check for required params
 
-    verifyRequiredParams(array('api_key', 'secret_key', 'my_uid', 'username', 'igid', 'password', 'profile_picture'));
+    verifyRequiredParams(array('api_key', 'secret_key', 'my_uid', 'username', 'igid', 'password', 'profile_picture', 'is_private'));
 
     $api_key = $app->request->post('api_key');
     $secret_key = $app->request->post('secret_key');
@@ -154,12 +154,13 @@ $app->post('/mobile/ig/link', function() use ($app) {
     $igid = $app->request->post('igid');
     $password = $app->request->post('password');
     $profile_picture = $app->request->post('profile_picture');
+    $is_private = $app->request->post('is_private');
 
     $response = array();
     $db = new DbHandlerMobile();
     $db->initializeAPI($api_key, $secret_key);
     if($db->validSession) {
-        $response = $db->linkIGAccount($my_uid, $username, $igid, $password, $profile_picture);
+        $response = $db->linkIGAccount($my_uid, $username, $igid, $password, $profile_picture, $is_private);
         if($response["error"])
         {
             echoResponse(511, $response);
