@@ -157,6 +157,7 @@ $app->post('/mobile/ig/link', function() use ($app) {
     $is_private = $app->request->post('is_private');
 
     $response = array();
+    // $response["null"] = 1324;
     $db = new DbHandlerMobile();
     $db->initializeAPI($api_key, $secret_key);
     if($db->validSession) {

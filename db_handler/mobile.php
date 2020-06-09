@@ -251,6 +251,15 @@ class DbHandlerMobile {
                 if ($user_id) {
                     $response["userData"] = $userData;
                     $response["type"] = 200;
+                    if($user_id==$my_uid)
+                    {
+                        $stmt = $this->conn->prepare("SELECT LA.ig_account_id, LA.username, LA.profile_picture, LA.password FROM linked_accounts LA
+                                WHERE LA.user_id=? AND LA.unlinked=0");
+                        $stmt->bind_param("i", $my_uid);
+                        if ($stmt->execute()) {
+                            $response["userData"]->{"ig_accounts"} = fetchData($stmt);
+                        }                        
+                    }
                     return $response;
                 } else {
                     $response["error"] = true;
@@ -443,34 +452,51 @@ class DbHandlerMobile {
             return $response;
         }
 
-        $sql = "INSERT INTO linked_accounts
-            (user_id, ig_account_id, username, private, password, profile_picture)
-            VALUES (?, ?, ?, ?, ?, ?)";
-
-        if (!($stmt = $this->conn->prepare($sql))) {
-            $response["error"] = true;
-            $response["errorID"] = 102;
-            $response["errorContent"] = "server error";
-            return $response;
-        }
-        if (!$stmt->bind_param("isissi", $my_uid, $username, $igid, $password, $profile_picture, $is_private)) {
-            $response["error"] = true;
-            $response["errorID"] = 102;
-            $response["errorContent"] = "server error";
-            $stmt->close();
-            return $response;
-        }
-        if (!$stmt->execute()) {
-            $response["error"] = true;
-            $response["errorID"] = 102;
-            $response["errorContent"] = "server error";
-            $stmt->close();
-            return $response;
-        } else {
+        $stmt = $this->conn->prepare("SELECT LA.linked_account_id FROM linked_accounts LA WHERE LA.user_id=? AND LA.ig_account_id=? AND LA.unlinked=0");
+        $stmt->bind_param("ii", $my_uid, $igid);
+        if ($stmt->execute()) {
             $dataRows = fetchData($stmt);
+            if (count($dataRows) == 0) {
+                $sql = "INSERT INTO linked_accounts
+                    (user_id, ig_account_id, username, private, password, profile_picture)
+                    VALUES (?, ?, ?, ?, ?, ?)";
+        
+                if (!($stmt = $this->conn->prepare($sql))) {
+                    $response["error"] = true;
+                    $response["errorID"] = 102;
+                    $response["errorContent"] = $stmt->error;
+                    return $response;
+                }
+                if (!$stmt->bind_param("iisiss", $my_uid, $igid, $username, $is_private, $password, $profile_picture)) {
+                    $response["error"] = true;
+                    $response["errorID"] = 102;
+                    $response["errorContent"] = $stmt->error;
+                    $stmt->close();
+                    return $response;
+                }
+                if (!$stmt->execute()) {
+                    $response["error"] = true;
+                    $response["errorID"] = 102;
+                    $response["errorContent"] = $stmt->error;
+                    $stmt->close();
+                    return $response;
+                } else {
+                    $stmt->close();
+                    $response["error"] = false;
+                    return $response;
+                }
+            } else {
+                $response["error"] = true;
+                $response["errorID"] = 102;
+                $response["errorContent"] = "server error";
+                $stmt->close();
+                return $response;
+            }
+        } else {
+            $response["error"] = true;
+            $response["errorID"] = 102;
+            $response["errorContent"] = $stmt->error;
             $stmt->close();
-            $response["error"] = false;
-            $response["errorID"] = 432;
             return $response;
         }
 
