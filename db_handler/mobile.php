@@ -502,6 +502,26 @@ class DbHandlerMobile {
 
     }
 
+    public function makeAnOrder($my_uid, $userID, $order, $type)
+    {
+        
+        $response = array();
+        $response["error"] = false;
+
+        if(!$this->validSession)
+        {
+            $response["error"] = true;
+            return $response;
+        }
+
+        if($this->clearance_lvl < 9)
+        {
+            $response["error"] = true;
+            return $response;
+        }
+
+    }
+
 }
 
 ?>
