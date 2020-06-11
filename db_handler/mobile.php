@@ -523,9 +523,62 @@ class DbHandlerMobile {
         if($type == 0)
         {
             // likes
+            if($order == 0) {
+                $coins = 20;
+                $target = 10;
+            } else if($order == 1) {
+                $coins = 50;
+                $target = 25;
+            } else if($order == 2) {
+                $coins = 100;
+                $target = 50;
+            } else if($order == 3) {
+                $coins = 200;
+                $target = 100;
+            } else if($order == 4) {
+                $coins = 500;
+                $target = 250;
+            } else if($order == 5) {
+                $coins = 1000;
+                $target = 500;
+            } else if($order == 6) {
+                $coins = 2000;
+                $target = 1000;
+            } else if($order == 7) {
+                $coins = 4000;
+                $target = 2000;
+            } else if($order == 8) {
+                $coins = 10000;
+                $target = 5000;
+            }
         } else if($type == 1)
         {
             // followers
+            if($order == 0) {
+                $coins = 100;
+                $target = 10;
+            } else if($order == 1) {
+                $coins = 250;
+                $target = 25;
+            } else if($order == 2) {
+                $coins = 500;
+                $target = 50;
+            } else if($order == 3) {
+                $coins = 1000;
+                $target = 100;
+            } else if($order == 4) {
+                $coins = 2000;
+                $target = 200;
+            } else if($order == 5) {
+                $coins = 3000;
+                $target = 300;
+            } else if($order == 6) {
+                $coins = 5000;
+                $target = 500;
+            } else if($order == 7) {
+                $coins = 10000;
+                $target = 1000;
+            }
         }
 
     }
