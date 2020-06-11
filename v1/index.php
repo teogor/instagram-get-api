@@ -157,7 +157,6 @@ $app->post('/mobile/ig/link', function() use ($app) {
     $is_private = $app->request->post('is_private');
 
     $response = array();
-    // $response["null"] = 1324;
     $db = new DbHandlerMobile();
     $db->initializeAPI($api_key, $secret_key);
     if($db->validSession) {
@@ -190,7 +189,6 @@ $app->post('/mobile/ig/followers/count', function() use ($app) {
     $username = $app->request->post('username');
 
     $response = array();
-    $response["null"] = 1324;
     $db = new DbHandlerMobile();
     $db->initializeAPI($api_key, $secret_key);
     if($db->validSession) {
@@ -223,7 +221,6 @@ $app->post('/mobile/ig/posts/details', function() use ($app) {
     $username = $app->request->post('username');
 
     $response = array();
-    $response["null"] = 1324;
     $db = new DbHandlerMobile();
     $db->initializeAPI($api_key, $secret_key);
     if($db->validSession) {
@@ -254,6 +251,40 @@ $app->post('/mobile/ig/posts/details', function() use ($app) {
         $response["posts"] = $posts;
         // echo json_encode($response, JSON_UNESCAPED_SLASHES);
         echoResponse(178, $response);
+    } else {
+        $response["error"] = true;
+        $response["errorID"] = 511;
+        $response["errorContent"] = "invalid api";
+        echoResponse(511, $response);
+    }
+
+});
+
+$app->post('/mobile/user/order', function() use ($app) {
+    // check for required params
+
+    verifyRequiredParams(array('api_key', 'secret_key', 'my_uid', 'userID', 'order', 'type'));
+
+    $api_key = $app->request->post('api_key');
+    $secret_key = $app->request->post('secret_key');
+    $my_uid = $app->request->post('my_uid');
+    $userID = $app->request->post('userID');
+    $order = $app->request->post('order');
+    $type = $app->request->post('type');
+
+    $response = array();
+    $db = new DbHandlerMobile();
+    $db->initializeAPI($api_key, $secret_key);
+    if($db->validSession) {
+        $response = $db->makeAnOrder($my_uid, $userID, $order, $type);
+        if($response["error"])
+        {
+            echoResponse(511, $response);
+        }
+        else
+        {
+            echoResponse(178, $response);
+        }
     } else {
         $response["error"] = true;
         $response["errorID"] = 511;
