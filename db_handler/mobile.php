@@ -520,6 +520,14 @@ class DbHandlerMobile {
             return $response;
         }
 
+        if($type == 0)
+        {
+            // likes
+        } else if($type == 1)
+        {
+            // followers
+        }
+
     }
 
 }
