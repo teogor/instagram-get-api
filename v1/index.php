@@ -230,7 +230,6 @@ $app->post('/mobile/ig/posts/details', function() use ($app) {
         $jsonData = file_get_contents($urlPart1 . $userID . $urlPart2);
         $jsonData = json_decode($jsonData);
 
-        $response = array();
         $response["has_next_page"] = $jsonData->data->user->edge_owner_to_timeline_media->page_info->has_next_page;
         $response["end_cursor"] = $jsonData->data->user->edge_owner_to_timeline_media->page_info->end_cursor;
 
@@ -249,8 +248,8 @@ $app->post('/mobile/ig/posts/details', function() use ($app) {
             $posts[] = $post;
         }
         $response["posts"] = $posts;
+        return echoResponse(178, $response);
         // echo json_encode($response, JSON_UNESCAPED_SLASHES);
-        echoResponse(178, $response);
     } else {
         $response["error"] = true;
         $response["errorID"] = 511;
