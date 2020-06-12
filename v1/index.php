@@ -247,7 +247,6 @@ $app->post('/mobile/ig/posts/details', function() use ($app) {
             $post["img640x640"] = $value->node->thumbnail_resources[3]->src;
             $posts[] = $post;
         }
-        $response["afsdg"] = 212;
         $response["posts"] = $posts;
         return echoResponse(178, $response);
         // echo json_encode($response, JSON_UNESCAPED_SLASHES);
