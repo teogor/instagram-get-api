@@ -261,7 +261,7 @@ $app->post('/mobile/ig/posts/details', function() use ($app) {
 $app->post('/mobile/user/order', function() use ($app) {
     // check for required params
 
-    verifyRequiredParams(array('api_key', 'secret_key', 'my_uid', 'userID', 'order', 'type'));
+    verifyRequiredParams(array('api_key', 'secret_key', 'my_uid', 'userID', 'order', 'type', 'imgPreview', 'postID'));
 
     $api_key = $app->request->post('api_key');
     $secret_key = $app->request->post('secret_key');
@@ -269,12 +269,14 @@ $app->post('/mobile/user/order', function() use ($app) {
     $userID = $app->request->post('userID');
     $order = $app->request->post('order');
     $type = $app->request->post('type');
+    $imgPreview = $app->request->post('imgPreview');
+    $postID = $app->request->post('postID');
 
     $response = array();
     $db = new DbHandlerMobile();
     $db->initializeAPI($api_key, $secret_key);
     if($db->validSession) {
-        $response = $db->makeAnOrder($my_uid, $userID, $order, $type);
+        $response = $db->makeAnOrder($my_uid, $userID, $order, $type, $imgPreview, $postID);
         if($response["error"])
         {
             echoResponse(511, $response);
