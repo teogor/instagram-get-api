@@ -213,12 +213,12 @@ $app->post('/mobile/ig/followers/count', function() use ($app) {
 $app->post('/mobile/ig/posts/details', function() use ($app) {
     // check for required params
 
-    verifyRequiredParams(array('api_key', 'secret_key', 'my_uid', 'username'));
+    verifyRequiredParams(array('api_key', 'secret_key', 'my_uid', 'ig_userid'));
 
     $api_key = $app->request->post('api_key');
     $secret_key = $app->request->post('secret_key');
     $my_uid = $app->request->post('my_uid');
-    $username = $app->request->post('username');
+    $ig_userid = $app->request->post('ig_userid');
 
     $response = array();
     $db = new DbHandlerMobile();
@@ -226,8 +226,7 @@ $app->post('/mobile/ig/posts/details', function() use ($app) {
     if($db->validSession) {
         $urlPart1 = 'https://www.instagram.com/graphql/query/?query_id=17888483320059182&variables=%7B%22id%22:%22';
         $urlPart2 = '%22,%22first%22:20000,%22after%22:null%7D';
-        $userID = 787132;
-        $jsonData = file_get_contents($urlPart1 . $userID . $urlPart2);
+        $jsonData = file_get_contents($urlPart1 . $ig_userid . $urlPart2);
         $jsonData = json_decode($jsonData);
 
         $response["has_next_page"] = $jsonData->data->user->edge_owner_to_timeline_media->page_info->has_next_page;
@@ -262,7 +261,7 @@ $app->post('/mobile/ig/posts/details', function() use ($app) {
 $app->post('/mobile/user/order', function() use ($app) {
     // check for required params
 
-    verifyRequiredParams(array('api_key', 'secret_key', 'my_uid', 'userID', 'order', 'type'));
+    verifyRequiredParams(array('api_key', 'secret_key', 'my_uid', 'userID', 'order', 'type', 'imgPreview', 'postID'));
 
     $api_key = $app->request->post('api_key');
     $secret_key = $app->request->post('secret_key');
@@ -270,12 +269,14 @@ $app->post('/mobile/user/order', function() use ($app) {
     $userID = $app->request->post('userID');
     $order = $app->request->post('order');
     $type = $app->request->post('type');
+    $imgPreview = $app->request->post('imgPreview');
+    $postID = $app->request->post('postID');
 
     $response = array();
     $db = new DbHandlerMobile();
     $db->initializeAPI($api_key, $secret_key);
     if($db->validSession) {
-        $response = $db->makeAnOrder($my_uid, $userID, $order, $type);
+        $response = $db->makeAnOrder($my_uid, $userID, $order, $type, $imgPreview, $postID);
         if($response["error"])
         {
             echoResponse(511, $response);
@@ -333,7 +334,7 @@ function echoResponse($status_code, $response) {
     // setting response content type to json
     $app->contentType('application/json');
 
-    echo json_encode($response);
+    echo json_encode($response, JSON_UNESCAPED_SLASHES);
 }
 
 $app->run();

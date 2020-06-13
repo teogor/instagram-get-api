@@ -502,7 +502,7 @@ class DbHandlerMobile {
 
     }
 
-    public function makeAnOrder($my_uid, $userID, $order, $type)
+    public function makeAnOrder($my_uid, $userID, $order, $type, $imgPreview, $postID)
     {
         
         $response = array();
@@ -579,6 +579,48 @@ class DbHandlerMobile {
                 $coins = 10000;
                 $target = 1000;
             }
+        }
+
+        if($type == 0) {
+            $response["type"] = "likes";
+        } else if($type == 1) {
+            $response["type"] = "followers";
+        }
+        $response["coins"] = $coins;
+        $response["target"] = $target;
+
+        $stmt = $this->conn->prepare("SELECT coins FROM users WHERE user_id = ?");
+        $stmt->bind_param("i", $my_uid);
+        if ($stmt->execute()) {
+            $dataRows = fetchData($stmt);
+            if (count($dataRows) == 0) {
+                $response["error"] = true;
+                return $response;
+            } else {
+                $userCoins = $dataRows[0]["coins"];
+                if($userCoins >= $coins)
+                {
+                    $coinsAfterPurchase = $userCoins - $coins;
+                    $stmt = $this->conn->prepare("UPDATE users SET coins=? WHERE user_id=?");
+                    $stmt->bind_param("ii", $coinsAfterPurchase, $my_uid);
+                    if($stmt->execute()) {
+                        $response["purchased"] = true;
+                        $response["coinsAfterPurchase"] = $coinsAfterPurchase;
+                        return $response;
+                    } else {
+                        $response["purchased"] = false;
+                        $response["error"] = true;
+                        return $response;
+                    }
+                } else
+                {
+                    $response["purchased"] = false;
+                    return $response;
+                }
+            }
+        } else {
+            $response["error"] = true;
+            return $response;
         }
 
     }
