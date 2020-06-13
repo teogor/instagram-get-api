@@ -581,20 +581,14 @@ class DbHandlerMobile {
             }
         }
 
-        if($type == 0) {
-            $response["type"] = "likes";
-        } else if($type == 1) {
-            $response["type"] = "followers";
-        }
-        $response["coins"] = $coins;
-        $response["target"] = $target;
-
         $stmt = $this->conn->prepare("SELECT coins FROM users WHERE user_id = ?");
         $stmt->bind_param("i", $my_uid);
         if ($stmt->execute()) {
             $dataRows = fetchData($stmt);
             if (count($dataRows) == 0) {
+                $response["errorID"] = 108;
                 $response["error"] = true;
+                $response["errorContent"] = "server error";
                 return $response;
             } else {
                 $userCoins = $dataRows[0]["coins"];
@@ -603,18 +597,36 @@ class DbHandlerMobile {
                     $coinsAfterPurchase = $userCoins - $coins;
                     $stmt = $this->conn->prepare("UPDATE users SET coins=? WHERE user_id=?");
                     $stmt->bind_param("ii", $coinsAfterPurchase, $my_uid);
-                    if($stmt->execute()) {
-                        $response["purchased"] = true;
+                    if($stmt->execute())
+                    {   
+                        if($type == 0) {
+                            $stmt = $this->conn->prepare("INSERT INTO orders (user_id, type, target, ig_account_id, post_id, post_image) VALUES (?, ?, ?, ?, ?, ?)");
+                            $stmt->bind_param("iiiiis", $my_uid, $type, $target, $userID, $postID, $imgPreview);
+                        } else if($type == 1) {
+                            $stmt = $this->conn->prepare("INSERT INTO orders (user_id, type, target, ig_account_id) VALUES (?, ?, ?, ?)");
+                            $stmt->bind_param("iiii", $my_uid, $type, $target, $userID);
+                        }
+                        
                         $response["coinsAfterPurchase"] = $coinsAfterPurchase;
-                        return $response;
+                        if ($stmt->execute()) {
+                            return $response;
+                        } else {
+                            $response["errorID"] = 108;
+                            $response["error"] = true;
+                            $response["errorContent"] = "server error";
+                            return $response;
+                        }
                     } else {
-                        $response["purchased"] = false;
+                        $response["errorID"] = 108;
                         $response["error"] = true;
+                        $response["errorContent"] = "server error";
                         return $response;
                     }
                 } else
                 {
-                    $response["purchased"] = false;
+                    $response["errorID"] = 108;
+                    $response["error"] = true;
+                    $response["errorContent"] = "server error";
                     return $response;
                 }
             }
