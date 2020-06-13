@@ -502,7 +502,7 @@ class DbHandlerMobile {
 
     }
 
-    public function makeAnOrder($my_uid, $userID, $order, $type)
+    public function makeAnOrder($my_uid, $userID, $order, $type, $imgPreview, $postID
     {
         
         $response = array();
