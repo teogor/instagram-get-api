@@ -294,6 +294,38 @@ $app->post('/mobile/user/order', function() use ($app) {
 
 });
 
+$app->post('/mobile/orders/retrieve', function() use ($app) {
+    // check for required params
+
+    verifyRequiredParams(array('api_key', 'secret_key', 'my_uid', 'type'));
+
+    $api_key = $app->request->post('api_key');
+    $secret_key = $app->request->post('secret_key');
+    $my_uid = $app->request->post('my_uid');
+    $type = $app->request->post('type');
+
+    $response = array();
+    $db = new DbHandlerMobile();
+    $db->initializeAPI($api_key, $secret_key);
+    if($db->validSession) {
+        $response = $db->retrieveOrders($my_uid, $type);
+        if($response["error"])
+        {
+            echoResponse(511, $response);
+        }
+        else
+        {
+            echoResponse(178, $response);
+        }
+    } else {
+        $response["error"] = true;
+        $response["errorID"] = 511;
+        $response["errorContent"] = "invalid api";
+        echoResponse(511, $response);
+    }
+
+});
+
 /**
  * Verifying required params posted or not
  */
