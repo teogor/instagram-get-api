@@ -625,6 +625,39 @@ class DbHandlerMobile {
 
     }
 
+    public function retrieveOrders($my_uid, $type)
+    {
+        
+        $response = array();
+        $response["error"] = false;
+
+        if(!$this->validSession)
+        {
+            $response["error"] = true;
+            return $response;
+        }
+
+        if($this->clearance_lvl < 7)
+        {
+            $response["error"] = true;
+            return $response;
+        }
+
+        $stmt = $this->conn->prepare("SELECT LA.linked_account_id FROM linked_accounts LA WHERE LA.user_id=? AND LA.ig_account_id=? AND LA.unlinked=0");
+        $stmt->bind_param("ii", $my_uid, $igid);
+        if ($stmt->execute()) {
+            $dataRows = fetchData($stmt);
+            
+        } else {
+            $response["error"] = true;
+            $response["errorID"] = 102;
+            $response["errorContent"] = $stmt->error;
+            $stmt->close();
+            return $response;
+        }
+
+    }
+
 }
 
 ?>
