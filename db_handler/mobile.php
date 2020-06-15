@@ -677,7 +677,9 @@ class DbHandlerMobile {
         $stmt->bind_param("i", $my_uid);
         if ($stmt->execute()) {
             $data = fetchData($stmt);
-            echo $data;
+            $response["data"] = $data;
+            $stmt->close();
+            return $response;
         } else {
             $response["error"] = true;
             $response["errorID"] = 102;
