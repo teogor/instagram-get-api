@@ -643,11 +643,29 @@ class DbHandlerMobile {
             return $response;
         }
 
-        $stmt = $this->conn->prepare("SELECT LA.linked_account_id FROM linked_accounts LA WHERE LA.user_id=? AND LA.ig_account_id=? AND LA.unlinked=0");
-        $stmt->bind_param("ii", $my_uid, $igid);
+        if($type == 0)
+        {
+            // in progress orders
+            $sql = "SELECT O.user_id, (SELECT COUNT(*) FROM interactions I WHERE I.order_id = O.order_id) AS interactions_count, O.target, O.type, O.ig_account_id, O.post_id, O.post_image, O.created_at
+                FROM orders O
+                WHERE O.user_id = ?
+                AND (SELECT COUNT(*) FROM interactions I WHERE I.order_id = O.order_id) < O.target
+                ORDER BY O.created_at DESC;";
+        }
+        else if($type == 1)
+        {
+            // completed orders
+            $sql = "SELECT O.user_id, (SELECT COUNT(*) FROM interactions I WHERE I.order_id = O.order_id) AS interactions_count, O.target, O.type, O.ig_account_id, O.post_id, O.post_image, O.created_at
+            FROM orders O
+            WHERE O.user_id = ?
+            AND (SELECT COUNT(*) FROM interactions I WHERE I.order_id = O.order_id) >= O.target
+            ORDER BY O.created_at DESC;";
+        }
+        $stmt = $this->conn->prepare($sql);
+        $stmt->bind_param("i", $my_uid);
         if ($stmt->execute()) {
-            $dataRows = fetchData($stmt);
-            
+            $data = fetchData($stmt);
+            echo $data;
         } else {
             $response["error"] = true;
             $response["errorID"] = 102;
