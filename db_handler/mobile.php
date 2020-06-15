@@ -637,6 +637,57 @@ class DbHandlerMobile {
 
     }
 
+    public function retrieveOrders($my_uid, $type)
+    {
+        
+        $response = array();
+        $response["error"] = false;
+
+        if(!$this->validSession)
+        {
+            $response["error"] = true;
+            return $response;
+        }
+
+        if($this->clearance_lvl < 7)
+        {
+            $response["error"] = true;
+            return $response;
+        }
+
+        if($type == 0)
+        {
+            // in progress orders
+            $sql = "SELECT O.user_id, (SELECT COUNT(*) FROM interactions I WHERE I.order_id = O.order_id) AS interactions_count, O.target, O.type, O.ig_account_id, O.post_id, O.post_image, O.created_at
+                FROM orders O
+                WHERE O.user_id = ?
+                AND (SELECT COUNT(*) FROM interactions I WHERE I.order_id = O.order_id) < O.target
+                ORDER BY O.created_at DESC;";
+        }
+        else if($type == 1)
+        {
+            // completed orders
+            $sql = "SELECT O.user_id, (SELECT COUNT(*) FROM interactions I WHERE I.order_id = O.order_id) AS interactions_count, O.target, O.type, O.ig_account_id, O.post_id, O.post_image, O.created_at
+            FROM orders O
+            WHERE O.user_id = ?
+            AND (SELECT COUNT(*) FROM interactions I WHERE I.order_id = O.order_id) >= O.target
+            ORDER BY O.created_at DESC;";
+        }
+        $stmt = $this->conn->prepare($sql);
+        $stmt->bind_param("i", $my_uid);
+        if ($stmt->execute()) {
+            $data = fetchData($stmt);
+            echo $data;
+        } else {
+            $response["error"] = true;
+            $response["errorID"] = 102;
+            $response["errorContent"] = $stmt->error;
+            $stmt->close();
+            return $response;
+        }
+
+    }
+
 }
 
 ?>
