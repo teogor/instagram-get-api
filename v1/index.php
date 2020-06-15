@@ -66,7 +66,6 @@ $app->post('/mobile/signup', function() use ($app) {
         }
         else
         {
-            // $response["data"] = $db->getUserDetails($response["uuid"], $response["uuid"]);
             echoResponse(200, $response);
         }
     } else {
@@ -192,15 +191,7 @@ $app->post('/mobile/ig/followers/count', function() use ($app) {
     $db = new DbHandlerMobile();
     $db->initializeAPI($api_key, $secret_key);
     if($db->validSession) {
-        // $response = $db->linkIGAccount($my_uid, $username, $igid, $password, $profile_picture, $is_private);
-        // if($response["error"])
-        // {
-        //     echoResponse(511, $response);
-        // }
-        // else
-        // {
-            echoResponse(178, $response);
-        // }
+        echoResponse(178, $response);
     } else {
         $response["error"] = true;
         $response["errorID"] = 511;
@@ -248,7 +239,6 @@ $app->post('/mobile/ig/posts/details', function() use ($app) {
         }
         $response["posts"] = $posts;
         return echoResponse(178, $response);
-        // echo json_encode($response, JSON_UNESCAPED_SLASHES);
     } else {
         $response["error"] = true;
         $response["errorID"] = 511;
