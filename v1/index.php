@@ -66,7 +66,6 @@ $app->post('/mobile/signup', function() use ($app) {
         }
         else
         {
-            // $response["data"] = $db->getUserDetails($response["uuid"], $response["uuid"]);
             echoResponse(200, $response);
         }
     } else {
