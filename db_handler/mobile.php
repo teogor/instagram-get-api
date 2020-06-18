@@ -692,6 +692,52 @@ class DbHandlerMobile {
 
     }
 
+    public function feedOrders($my_uid, $ig_account_id)
+    {
+        
+        $response = array();
+        $response["error"] = false;
+
+        if(!$this->validSession)
+        {
+            $response["error"] = true;
+            return $response;
+        }
+
+        if($this->clearance_lvl < 7)
+        {
+            $response["error"] = true;
+            return $response;
+        }
+
+        $sql = "SELECT O.order_id, O.type, O.post_id, O.ig_account_id
+            FROM orders O
+            WHERE 0 =
+            CASE 
+                WHEN O.type = 1 THEN (SELECT COUNT(*) FROM interactions I WHERE I.ig_account_id = ?)
+                WHEN O.type = 0 THEN (SELECT COUNT(*) FROM interactions I WHERE I.ig_account_id = ? AND I.post_id = O.post_id)
+                ELSE 3
+            END
+            GROUP BY O.ig_account_id, O.post_id
+            ORDER BY O.created_at";
+
+        $stmt = $this->conn->prepare($sql);
+        $stmt->bind_param("ii", $ig_account_id, $ig_account_id);
+        if ($stmt->execute()) {
+            $feed = fetchData($stmt);
+            $response["feed"] = $feed;
+            $stmt->close();
+            return $response;
+        } else {
+            $response["error"] = true;
+            $response["errorID"] = 102;
+            $response["errorContent"] = $stmt->error;
+            $stmt->close();
+            return $response;
+        }
+
+    }
+
     public function interactOrder($my_uid, $ig_account_id, $order_id, $post_id)
     {
         
