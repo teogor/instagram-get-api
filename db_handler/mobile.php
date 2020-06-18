@@ -690,6 +690,13 @@ class DbHandlerMobile {
 
     }
 
+    public function interactOrder($my_uid, $ig_account_id, $order_id, $post_id)
+    {
+
+        
+
+    }
+
 }
 
 ?>
