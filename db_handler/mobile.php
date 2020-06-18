@@ -710,6 +710,28 @@ class DbHandlerMobile {
             return $response;
         }
 
+        $sql = "SELECT O.user_id, (SELECT COUNT(*) FROM interactions I WHERE I.order_id = O.order_id) AS interactions_count, O.target, O.type, O.ig_account_id, O.post_id, O.post_image, O.created_at, LA.profile_picture
+                FROM orders O
+                INNER JOIN linked_accounts LA ON LA.ig_account_id=O.ig_account_id
+                WHERE O.user_id = ?
+                AND (SELECT COUNT(*) FROM interactions I WHERE I.order_id = O.order_id) >= O.target
+                ORDER BY O.created_at DESC";
+                
+        $stmt = $this->conn->prepare($sql);
+        $stmt->bind_param("i", $my_uid);
+        if ($stmt->execute()) {
+            $data = fetchData($stmt);
+            $response["data"] = $data;
+            $stmt->close();
+            return $response;
+        } else {
+            $response["error"] = true;
+            $response["errorID"] = 102;
+            $response["errorContent"] = $stmt->error;
+            $stmt->close();
+            return $response;
+        }
+
     }
 
     public function interactOrder($my_uid, $ig_account_id, $order_id, $post_id)
