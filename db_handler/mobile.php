@@ -692,8 +692,23 @@ class DbHandlerMobile {
 
     public function interactOrder($my_uid, $ig_account_id, $order_id, $post_id)
     {
-
         
+        $response = array();
+        $response["error"] = false;
+
+        if(!$this->validSession)
+        {
+            $response["error"] = true;
+            return $response;
+        }
+
+        if($this->clearance_lvl < 7)
+        {
+            $response["error"] = true;
+            return $response;
+        }
+
+
 
     }
 
