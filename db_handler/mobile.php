@@ -710,18 +710,22 @@ class DbHandlerMobile {
             return $response;
         }
 
-        $sql = "SELECT O.user_id, (SELECT COUNT(*) FROM interactions I WHERE I.order_id = O.order_id) AS interactions_count, O.target, O.type, O.ig_account_id, O.post_id, O.post_image, O.created_at, LA.profile_picture
-                FROM orders O
-                INNER JOIN linked_accounts LA ON LA.ig_account_id=O.ig_account_id
-                WHERE O.user_id = ?
-                AND (SELECT COUNT(*) FROM interactions I WHERE I.order_id = O.order_id) >= O.target
-                ORDER BY O.created_at DESC";
-                
+        $sql = "SELECT O.order_id, O.type, O.post_id, O.ig_account_id
+            FROM orders O
+            WHERE 0 =
+            CASE 
+                WHEN O.type = 1 THEN (SELECT COUNT(*) FROM interactions I WHERE I.ig_account_id = ?)
+                WHEN O.type = 0 THEN (SELECT COUNT(*) FROM interactions I WHERE I.ig_account_id = ? AND I.post_id = O.post_id)
+                ELSE 3
+            END
+            GROUP BY O.ig_account_id, O.post_id
+            ORDER BY O.created_at";
+
         $stmt = $this->conn->prepare($sql);
-        $stmt->bind_param("i", $my_uid);
+        $stmt->bind_param("ii", $ig_account_id, $ig_account_id);
         if ($stmt->execute()) {
-            $data = fetchData($stmt);
-            $response["data"] = $data;
+            $feed = fetchData($stmt);
+            $response["feed"] = $feed;
             $stmt->close();
             return $response;
         } else {
