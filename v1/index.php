@@ -330,7 +330,7 @@ $app->post('/mobile/orders/feed', function() use ($app) {
     $db = new DbHandlerMobile();
     $db->initializeAPI($api_key, $secret_key);
     if($db->validSession) {
-        $response = $db->interactOrder($my_uid, $ig_account_id);
+        $response = $db->feedOrders($my_uid, $ig_account_id);
         if($response["error"])
         {
             echoResponse(511, $response);
