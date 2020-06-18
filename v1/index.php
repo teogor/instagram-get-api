@@ -319,7 +319,7 @@ $app->post('/mobile/orders/retrieve', function() use ($app) {
 $app->post('/mobile/orders/interact', function() use ($app) {
     // check for required params
 
-    verifyRequiredParams(array('api_key', 'secret_key', 'my_uid', 'type'));
+    verifyRequiredParams(array('api_key', 'secret_key', 'my_uid', 'ig_account_id', 'order_id', 'post_id'));
 
     $api_key = $app->request->post('api_key');
     $secret_key = $app->request->post('secret_key');
