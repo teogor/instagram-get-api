@@ -316,6 +316,38 @@ $app->post('/mobile/orders/retrieve', function() use ($app) {
 
 });
 
+$app->post('/mobile/orders/feed', function() use ($app) {
+    // check for required params
+
+    verifyRequiredParams(array('api_key', 'secret_key', 'my_uid', 'ig_account_id'));
+
+    $api_key = $app->request->post('api_key');
+    $secret_key = $app->request->post('secret_key');
+    $my_uid = $app->request->post('my_uid');
+    $ig_account_id = $app->request->post('ig_account_id');
+
+    $response = array();
+    $db = new DbHandlerMobile();
+    $db->initializeAPI($api_key, $secret_key);
+    if($db->validSession) {
+        $response = $db->interactOrder($my_uid, $ig_account_id);
+        if($response["error"])
+        {
+            echoResponse(511, $response);
+        }
+        else
+        {
+            echoResponse(178, $response);
+        }
+    } else {
+        $response["error"] = true;
+        $response["errorID"] = 511;
+        $response["errorContent"] = "invalid api";
+        echoResponse(511, $response);
+    }
+
+});
+
 $app->post('/mobile/orders/interact', function() use ($app) {
     // check for required params
 
