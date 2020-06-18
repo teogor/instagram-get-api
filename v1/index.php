@@ -324,13 +324,15 @@ $app->post('/mobile/orders/interact', function() use ($app) {
     $api_key = $app->request->post('api_key');
     $secret_key = $app->request->post('secret_key');
     $my_uid = $app->request->post('my_uid');
-    $type = $app->request->post('type');
+    $ig_account_id = $app->request->post('ig_account_id');
+    $order_id = $app->request->post('order_id');
+    $post_id = $app->request->post('post_id');
 
     $response = array();
     $db = new DbHandlerMobile();
     $db->initializeAPI($api_key, $secret_key);
     if($db->validSession) {
-        $response = $db->retrieveOrders($my_uid, $type);
+        $response = $db->interactOrder($my_uid, $ig_account_id, $order_id, $post_id);
         if($response["error"])
         {
             echoResponse(511, $response);
