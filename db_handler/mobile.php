@@ -710,23 +710,6 @@ class DbHandlerMobile {
             return $response;
         }
 
-        if(is_null($post_id)) {
-            $stmt = $this->conn->prepare("INSERT INTO interactions (user_id, ig_account_id, order_id) VALUES (?, ?, ?)");
-            $stmt->bind_param("iii", $my_uid, $ig_account_id, $order_id);
-        } else {
-            $stmt = $this->conn->prepare("INSERT INTO interactions (user_id, ig_account_id, order_id, post_id) VALUES (?, ?, ?, ?)");
-            $stmt->bind_param("iiis", $my_uid, $ig_account_id, $order_id, $post_id);
-        }
-        
-        if ($stmt->execute()) {
-            return $response;
-        } else {
-            $response["errorID"] = 108;
-            $response["error"] = true;
-            $response["errorContent"] = "server error";
-            return $response;
-        }
-
     }
 
     public function interactOrder($my_uid, $ig_account_id, $order_id, $post_id)
