@@ -713,7 +713,7 @@ class DbHandlerMobile {
         $sql = "SELECT O.order_id, O.type, O.post_id, O.ig_account_id, O.post_image, LA.profile_picture
             FROM orders O
             INNER JOIN linked_accounts LA ON LA.ig_account_id=O.ig_account_id
-            WHERE O.ig_account_id <> ? AND .0 =
+            WHERE O.ig_account_id <> ? AND 0 =
             CASE 
                 WHEN O.type = 1 THEN (SELECT COUNT(*) FROM interactions I WHERE I.ig_account_id = ?)
                 WHEN O.type = 0 THEN (SELECT COUNT(*) FROM interactions I WHERE I.ig_account_id = ? AND I.post_id = O.post_id)
